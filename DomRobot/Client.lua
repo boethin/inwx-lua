@@ -1,3 +1,9 @@
+-- XML-RPC client for the INWX Domain API in Lua.
+--
+-- Copyright (c) 2015 Sebastian Böthin <sebastian@boethin.berlin>
+--
+-- Project home: https://github.com/boethin/inwx-lua
+
 -- import global symbols
 local assert = assert
 local type = type
@@ -8,9 +14,10 @@ local setmetatable = setmetatable
 local tostring = tostring
 local print = print
 
-module("DomRobot")
+module("DomRobot/Client")
 
 -- externals
+local io = require "io"
 local socket = require "socket"
 local http = require "socket.http"
 local ltn12 = require "ltn12"
@@ -55,7 +62,11 @@ function DomRobot.headers(contentLength,authCookie)
 	return h
 end
 
-function DomRobot.httpsRequest(http_args,ssl_args)
+--------------------------------------------------------------------------------
+-- DomRobot.Client instance
+--
+
+local function httpsRequest(http_args,ssl_args)
 
   local try = socket.try
   local protect = socket.protect
@@ -86,13 +97,17 @@ function DomRobot.httpsRequest(http_args,ssl_args)
 
     return setmetatable(t, {__index = idx})
   end
-  
+
   assert(type(http_args.url) == "string")
   for i, v in pairs(http_args) do print ('\t', i, v) end
   print("--")
 
   return http.request(http_args);
 end
+
+--------------------------------------------------------------------------------
+-- DomRobot.Client instance
+--
 
 -- constructor
 function DomRobot.new(host,ssl_args,authCookie)
@@ -115,7 +130,7 @@ function DomRobot:call(object,method,request,expectedCode)
   
   -- HTTPS POST request
   local responseBody = {}
-  local request_ok, http_status, response_headers = DomRobot.httpsRequest({
+  local request_ok, http_status, response_headers = httpsRequest({
 		url = DomRobot.url(self.host),
 		source = ltn12.source.string(requestBody),
 		sink = ltn12.sink.table(responseBody),
@@ -133,23 +148,23 @@ function DomRobot:call(object,method,request,expectedCode)
   assert(type(results.code) == "number", "Invalid field 'code' in response data.")
   assert(type(results.msg) == "string", "Invalid field 'msg' in response data.")
 
---   for i, v in pairs(results) do print ('\t', i, v) end
---   print("--")
+   for i, v in pairs(results) do print ('\t', i, v) end
+   print("--")
 
   if expectedCode then -- assert expected result
-    assert(results.code == expectedCode, DomRobot.failure("account","login",results))
+    assert(results.code == expectedCode, DomRobot.failure(object,method,results))
   end
   return ok, results, response_headers
 end
 
 
-function DomRobot:login(username,password,lang)
+function DomRobot:login(user,pass,lang)
   self.authCookie = nil -- reset member
 
   -- send request
   local ok, results, responseHeaders = self:call("account","login", {
-    user = username,
-    pass = password,
+    user = user,
+    pass = pass,
     lang = lang
   }, 1000)
   
@@ -162,6 +177,24 @@ function DomRobot:login(username,password,lang)
   return self.authCookie
 end
 
+function DomRobot:persistantLogin(file,user,pass,lang)
+  self.authCookie = nil -- reset member
+
+  -- use persistent authentication
+  local f = io.open(file, "r")
+  if f ~= nil then -- file exists
+    self.authCookie = f:read("*all")
+    io.close(f)
+  else -- send authentication request and save to file
+    local a = self:login(user,pass,lang)
+    f = io.open(file, "w")
+    f:write(a)
+    f:close()
+  end
+
+  assert(DomRobot.authMatch(self.authCookie))
+  return self.authCookie
+end
+
 
 return DomRobot
-
