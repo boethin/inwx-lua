@@ -1,8 +1,8 @@
--- XML-RPC client for the INWX Domain API in Lua.
+-- Lua XML-RPC client for the INWX Domain API.
 --
 -- Copyright (c) 2015 Sebastian Böthin <sebastian@boethin.berlin>
---
 -- Project home: https://github.com/boethin/inwx-lua
+--
 
 -- import global symbols
 local assert = assert
@@ -23,6 +23,8 @@ local http = require "socket.http"
 local ltn12 = require "ltn12"
 local ssl = require "ssl"
 local xmlrpc = require "xmlrpc"
+
+local https = require "DomRobot/https"
 
 local DomRobot = {}
 DomRobot.__index = DomRobot
@@ -66,6 +68,7 @@ end
 -- DomRobot.Client instance
 --
 
+--[[
 local function httpsRequest(http_args,ssl_args)
 
   local try = socket.try
@@ -104,6 +107,7 @@ local function httpsRequest(http_args,ssl_args)
 
   return http.request(http_args);
 end
+--]]
 
 --------------------------------------------------------------------------------
 -- DomRobot.Client instance
@@ -130,7 +134,7 @@ function DomRobot:call(object,method,request,expectedCode)
   
   -- HTTPS POST request
   local responseBody = {}
-  local request_ok, http_status, response_headers = httpsRequest({
+  local request_ok, http_status, response_headers = https.request({
 		url = DomRobot.url(self.host),
 		source = ltn12.source.string(requestBody),
 		sink = ltn12.sink.table(responseBody),
