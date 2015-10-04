@@ -11,7 +11,6 @@
 --
 local http = require "socket.http"
 local ssl = require "ssl"
-local ltn12 = require "ltn12"
 
 local https = {}
 
