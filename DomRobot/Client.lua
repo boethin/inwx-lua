@@ -1,8 +1,9 @@
--- Lua XML-RPC client for the INWX Domain API.
+--------------------------------------------------------------------------------
+-- Lua client for the DomRobot XML-RPC API.
+-- https://github.com/boethin/inwx-lua
 --
 -- Copyright (c) 2015 Sebastian Böthin <sebastian@boethin.berlin>
--- Project home: https://github.com/boethin/inwx-lua
---
+--------------------------------------------------------------------------------
 
 -- externals
 local io        = require "io"
@@ -13,8 +14,7 @@ local https     = require "DomRobot/https"
 -- namespace DomRobot
 local DomRobot = {}
 
---------------------------------------------------------------------------------
--- DomRobot.Client instance
+-- DomRobot.Client
 --
 DomRobot.Client = {}
 DomRobot.Client.__index = DomRobot.Client
@@ -114,4 +114,3 @@ function DomRobot.Client:persistantLogin(file,user,pass,lang)
 end
 
 return DomRobot.Client
-

@@ -1,3 +1,9 @@
+--------------------------------------------------------------------------------
+-- Lua client for the DomRobot XML-RPC API.
+-- https://github.com/boethin/inwx-lua
+--
+-- Copyright (c) 2015 Sebastian Böthin <sebastian@boethin.berlin>
+--------------------------------------------------------------------------------
 
 -- namespace DomRobot
 local DomRobot = {}
