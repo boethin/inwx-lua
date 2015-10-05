@@ -40,13 +40,26 @@ DomRobot.API = {
   	if authCookie then h["cookie"] = authCookie end
   	return h
   end,
+  
+  prototype = {
+
+    login = function(s,user,pass,lang)
+      return s.client:login(user,pass,lang)
+    end,
+
+    persistentLogin = function(s,file,user,pass,lang)
+      return s.client:persistentLogin(file,user,pass,lang)
+    end
+
+  },
 
   -- metatable:
   -- Any other symbol is treated as API object namespace, providing a set of
   -- functions and thus 'api.object:method(args)' calls.
   mt = {
     __index = function(table,key)
-      return DomRobot.API.Object.new(table.client,key)
+      if DomRobot.API.prototype[key] then return DomRobot.API.prototype[key] end
+      return DomRobot.API.Object.new(table.client,key) -- assume object namespace
     end
   },
   

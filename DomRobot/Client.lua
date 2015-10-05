@@ -94,7 +94,7 @@ function DomRobot.Client:login(user,pass,lang)
   return self.authCookie
 end
 
-function DomRobot.Client:persistantLogin(file,user,pass,lang)
+function DomRobot.Client:persistentLogin(file,user,pass,lang)
   self.authCookie = nil -- reset member
 
   -- use persistent authentication
