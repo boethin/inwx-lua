@@ -12,35 +12,41 @@ local DomRobot = {}
 -- Interface specification.
 DomRobot.API = {
 
+  -- DomRobot API URL
   url = function(host)
+    -- For socket.http, it is important to explicitely mention the port
     return "https://" .. host .. ":443/xmlrpc/"
   end,
 
+  -- DomRobot API functions have the form "object.method"
   methodName = function(object,method)
     return object .. "." .. method
   end,
 
-  -- Error message
+  -- Format server error code + message
   failure = function (object,method,response)
     return "Server replied to " .. DomRobot.API.methodName(object,method) ..  ": " ..
       tostring(response.code) .. " - " .. response.msg
   end,
 
+  -- Authentication pattern
   authMatch = function(cookie)
     -- cookie looks like: "domrobot=5599118952f13f5a00a47f3f2fa7b1a5; path=/"
     return cookie:match("^domrobot=[^;]+")
   end,
 
+  -- Request headers
   headers = function(contentLength,authCookie)
     local h = {
       ["content-type"] = "text/xml; charset=utf-8"
-      -- add more custom headers here
-  	}
-  	if contentLength then h["content-length"] = contentLength end
-  	if authCookie then h["cookie"] = authCookie end
-  	return h
+      -- add custom headers here
+    }
+    if contentLength then h["content-length"] = contentLength end
+    if authCookie then h["cookie"] = authCookie end
+    return h
   end,
-  
+
+  -- Member functions
   prototype = {
 
     login = function(s,user,pass,lang)
@@ -54,7 +60,7 @@ DomRobot.API = {
   },
 
   -- metatable:
-  -- Any other symbol is treated as API object namespace, providing a set of
+  -- Any unknown symbol is treated as API object namespace, providing a set of
   -- functions and thus 'api.object:method(args)' calls.
   mt = {
     __index = function(table,key)
@@ -70,6 +76,7 @@ DomRobot.API = {
   	return self
   end,
 
+  -- DomRobot API object namespace, providing methods.
   Object = {
 
     -- metatable:

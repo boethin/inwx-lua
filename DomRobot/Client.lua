@@ -26,6 +26,7 @@ setmetatable(DomRobot.Client, {
 })
 
 -- DomRobot.Client c'tor
+--
 function DomRobot.Client.new(api,host,ssl_args,authCookie)
   local self = setmetatable({}, DomRobot.Client)
   
@@ -37,6 +38,12 @@ function DomRobot.Client.new(api,host,ssl_args,authCookie)
   return self
 end
 
+-- This method does:
+-- > encoding request data
+-- > sending request
+-- > receiving response
+-- > decoding response data
+--
 function DomRobot.Client:call(object,method,request,expectedCode)
   -- argument type check
   assert(type(object) == "string", "Invalid argument 'object': string value expected")
@@ -74,7 +81,8 @@ function DomRobot.Client:call(object,method,request,expectedCode)
   return ok, results, response_headers
 end
 
-
+-- Request account.login() and retrive authentication cookie on success.
+--
 function DomRobot.Client:login(user,pass,lang)
   self.authCookie = nil -- reset member
 
@@ -94,6 +102,8 @@ function DomRobot.Client:login(user,pass,lang)
   return self.authCookie
 end
 
+-- Look up a cookie file or request account.login() and store cookie file.
+--
 function DomRobot.Client:persistentLogin(file,user,pass,lang)
   self.authCookie = nil -- reset member
 
