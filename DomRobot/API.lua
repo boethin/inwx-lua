@@ -92,4 +92,10 @@ DomRobot.API = {
 
 }
 
+setmetatable(DomRobot.API, {
+  __call = function (cls, ...)
+    return cls.new(...)
+  end,
+})
+
 return DomRobot.API;
