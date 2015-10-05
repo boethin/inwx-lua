@@ -10,6 +10,7 @@ The DomRobot API provides an interface for managing domain names, DNS, hosting a
 
 ## Dependencies
 
+* [Lua XML-RPC](https://github.com/timn/lua-xmlrpc)
 * [LuaSocket](https://github.com/diegonehab/luasocket)
 * [LuaSec](https://github.com/brunoos/luasec)
  
