@@ -12,30 +12,30 @@ local DomRobot = {}
 -- Interface specification.
 DomRobot.API = {
 
-  -- DomRobot API URL
+  -- DomRobot API URL.
   url = function(host)
     -- For socket.http, it is important to explicitely mention the port
     return "https://" .. host .. ":443/xmlrpc/"
   end,
 
-  -- DomRobot API functions have the form "object.method"
+  -- DomRobot API functions have the form "object.method".
   methodName = function(object,method)
     return object .. "." .. method
   end,
 
-  -- Format server error code + message
+  -- Format server error code + message.
   failure = function (object,method,response)
     return "Server replied to " .. DomRobot.API.methodName(object,method) ..  ": " ..
       tostring(response.code) .. " - " .. response.msg
   end,
 
-  -- Authentication pattern
+  -- Authentication pattern.
   authMatch = function(cookie)
     -- cookie looks like: "domrobot=5599118952f13f5a00a47f3f2fa7b1a5; path=/"
     return cookie:match("^domrobot=[^;]+")
   end,
 
-  -- Request headers
+  -- Request headers.
   headers = function(contentLength,authCookie)
     local h = {
       ["content-type"] = "text/xml; charset=utf-8"
@@ -44,6 +44,12 @@ DomRobot.API = {
     if contentLength then h["content-length"] = contentLength end
     if authCookie then h["cookie"] = authCookie end
     return h
+  end,
+
+  -- Whether or not a result code indicates a successful request.
+  successful = function(res)
+    -- See https://www.inwx.com/de/help/apidoc/f/ch04.html for possible result codes.
+    return res.code >= 1000 and res.code < 2000
   end,
 
   -- Member functions

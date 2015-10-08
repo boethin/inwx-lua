@@ -65,20 +65,17 @@ function DomRobot.Client:call(object,method,request,expectedCode)
 	assert(request_ok, "Request failed: " .. http_status)
 	assert(http_status == 200, "HTTP Status: " .. http_status)
 
-  ok, results = xmlrpc.clDecode(table.concat(responseBody))
+  local ok, res = xmlrpc.clDecode(table.concat(responseBody))
 
   -- at least require this
-  assert(ok, "Did not get a successful xmlrpc response.")
-  assert(type(results.code) == "number", "Invalid field 'code' in response data.")
-  assert(type(results.msg) == "string", "Invalid field 'msg' in response data.")
-
-   for i, v in pairs(results) do print ('\t', i, v) end
-   print("--")
+  assert(ok, "Did not get a successful xmlrpc response: " )
+  assert(type(res.code) == "number", "Invalid field 'code' in response data.")
+  assert(type(res.msg) == "string", "Invalid field 'msg' in response data.")
 
   if expectedCode then -- assert expected result
-    assert(results.code == expectedCode, self.api.failure(object,method,results))
+    assert(res.code == expectedCode, self.api.failure(object,method,res))
   end
-  return ok, results, response_headers
+  return self.api.successful(res), res, response_headers
 end
 
 -- Request account.login() and retrive authentication cookie on success.
@@ -124,3 +121,4 @@ function DomRobot.Client:persistentLogin(file,user,pass,lang)
 end
 
 return DomRobot.Client
+

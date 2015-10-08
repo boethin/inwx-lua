@@ -58,14 +58,37 @@ local api = DomRobot.API(DomRobot.Client(DomRobot.API,creds.host,SSLParams))
 -- Authenticate or load cookie file
 api:persistentLogin(authFile,creds.user,creds.pass,creds.lang)
 
--- Request account.info to see if it works.
-local ok, res = api.account:info()
+local ok, res
 
-for i, v in pairs(res.resData) do print ('\t', i, v) end
-print("--")
+--------------------------------------------------------------------------------
+-- Example:
+-- Request account.info() to see if it works.
+ok, res = api.account:info()
+if ok then
+  -- request successful:
+  assert(res.resData.email)
+  print("request ok: your email is:", res.resData.email)
+else
+  -- request failed
+  for i, v in pairs(res) do print ('\t', i, v) end
+end
 
-
-
+--------------------------------------------------------------------------------
+-- Example: 
+-- Check some domains for availabilty.
+-- unpack() Lua table to send XML-RPC array
+-- DOES NOT WORK PROPERLY
+ok, res = api.domain:check( { domain = unpack({ "example.net", "example.global", "foo.bar" }) } )
+if ok then
+  -- request successful:
+  assert(type(res.resData.domain) == "table")
+  for i, v in pairs(res.resData.domain) do 
+    print ('\t', i, v.domain,v.avail,v.status ) 
+  end
+else
+  -- request failed
+  for i, v in pairs(res) do print ('\t', i, v) end
+end
 
 
 
