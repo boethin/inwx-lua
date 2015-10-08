@@ -14,8 +14,9 @@ Code has been tested with Lua5.1, Lua5.2
 
 ## Dependencies
 
+* [LuaExpat](https://github.com/LuaDist/luaexpat)
 * [Lua XML-RPC](https://github.com/timn/lua-xmlrpc)
 * [LuaSocket](https://github.com/diegonehab/luasocket)
-* [LuaSec](https://github.com/brunoos/luasec)
+* [LuaSec](https://github.com/brunoos/luasec) (may require openssl)
  
-You may need also openssl in order to get LuaSec working.
+
